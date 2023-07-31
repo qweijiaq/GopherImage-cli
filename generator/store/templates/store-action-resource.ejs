@@ -1,0 +1,107 @@
+import { Module } from 'vuex';
+import { RootState } from '@/app/app.store';
+import { apiHttpClient } from '@/app/app.service';
+<% if (resourceType === 'Array') { %>
+export interface <%= resourceItemType %> {
+  data: null;
+}
+
+export type <%= resourceTypeName %> = Array<<%= resourceItemType %>>;<% } else { %>
+export interface <% resourceTypeName %> {
+  data: null;
+}<% } %>
+
+export interface <%= storeStateName %> {
+  loading: boolean;
+  <%= resourceName %>: <%= resourceTypeName %> | null;
+}
+
+export interface <%= actionParamType %> {
+  data?: null;
+}
+
+export const <%= storeModuleName %>: Module<<%= storeStateName %>, RootState> = {
+  /**
+   * 命名空间
+   */
+  namespaced: true,
+
+  /**
+   * 数据
+   */
+  state: {
+    loading: false,
+    <%= resourceName %>: null,
+  } as <%= storeStateName %>,
+
+  /**
+   * 获取器
+   */
+  getters: {
+    loading(state) {
+      return state.loading;
+    },
+
+    <%= resourceName %>(state) {
+      return state.<%= resourceName %>;
+    }
+  },
+
+  /**
+   * 修改器
+   */
+  mutations: {
+    setLoading(state, data) {
+      state.loading = data;
+    },
+
+    set<%= resourceNameCapitalize %>(state, data) {
+      state.<%= resourceName %> = data;
+    }
+  },
+
+  /**
+   * 动作
+   */
+  actions: {
+    async <%= action %>({ commit<% if (pre || post) { %>, dispatch<% } %> }, <%= actionParam %>: <%= actionParamType %> = {}) {<% if (pre) { %>
+      dispatch('<%= action %>PreProcess', <%= actionParam %>);
+      <% } else { %>
+      commit('setLoading', true);
+      <% } %>
+      try {
+        const response = await apiHttpClient.<%= method %>(`<%= api %>`);
+        <% if (post) { %>
+        dispatch('<%= action %>PostProcess', response);
+        <% } else { %>
+        commit('set<%= resourceNameCapitalize %>', response.data);
+        commit('setLoading', false);
+        <% } %>
+        return response;
+      } catch (error) {
+        commit('setLoading', false);
+
+        const _error = error as any;
+
+        if (_error.response) {
+          throw _error.response;
+        }  
+      }
+    },<% if(pre) { %>
+
+    async <%= action %>PreProcess({ commit }, <%= actionParam %>: <%= actionParamType %> = {}) {
+      commit('setLoading', true);
+    },<% } %><% if (post) { %>
+
+    async <%= action %>PostProcess({ commit }, response) {
+      commit('setLoading', false);
+      commit('set<%= resourceNameCapitalize %>', response.data);
+    },<% } %>
+  },
+
+  /**
+   * 模块
+   */
+  modules: {
+  },
+};

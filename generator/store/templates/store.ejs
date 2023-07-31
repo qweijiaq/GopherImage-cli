@@ -1,0 +1,47 @@
+import { Module } from 'vuex';
+import { RootState } from '@/app/app.store';
+
+export interface <%= storeStateName %> {
+  name: string;
+}
+
+export const <%= storeModuleName %>: Module<<%= storeStateName %>, RootState> = {
+  /**
+   * 命名空间
+   */
+  namespaced: true,
+
+  /**
+   * 数据
+   */
+  state: {
+    name: '<%= storeModuleName %>',
+  } as <%= storeStateName %>,
+
+  /**
+   * 获取器
+   */
+  getters: {
+   
+  },
+
+  /**
+   * 修改器
+   */
+  mutations: {
+
+  },
+
+  /**
+   * 动作
+   */
+  actions: {
+
+  },
+
+  /**
+   * 模块
+   */
+  modules: {
+  },
+};

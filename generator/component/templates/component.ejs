@@ -1,0 +1,16 @@
+<template>
+    <div class="<%= componentName %>">
+        <%= componentNamePascalCase %>
+    </div>
+</template>
+
+<script lang="ts" setup>
+  import { computed, ref, reactive } from 'vue';<% if (vuex) { %>
+  import { useStore } from 'vuex';<% } %>
+
+  const store = useStore()
+</script>
+
+<style scoped>
+    @import './styles/<%= componentName %>.css';
+</style>
